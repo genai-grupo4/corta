@@ -23,6 +23,16 @@ Usa el runner nativo de Node (`node --test`), sin dependencias de testing.
 Cada test levanta la app en un puerto libre con su propio archivo de datos
 temporal, así que corren aislados y en cualquier orden.
 
+Los tests del backend de Postgres se saltan salvo que le pases una base:
+
+```bash
+TEST_DATABASE_URL="postgresql://usuario@localhost:5432/corta" npm test
+```
+
+Vale la pena correrlos antes de deployar: son los que verifican que la
+implementación que se usa en producción cumple el mismo SPEC que la de
+desarrollo.
+
 ## Cómo está armado
 
 ```
