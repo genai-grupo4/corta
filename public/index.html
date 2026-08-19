@@ -109,16 +109,39 @@
         const li = document.createElement('li');
         li.className = 'historial-item';
         li.style.animationDelay = `${Math.min(indice, 10) * 40}ms`;
-        li.innerHTML = `
-          <div class="historial-item-info">
-            <a class="historial-codigo" href="${item.corta}" target="_blank" rel="noopener">${item.corta}</a>
-            <span class="historial-url" title="${item.url}">${item.url}</span>
-          </div>
-          <div class="historial-item-acciones">
-            <span class="historial-fecha">${formatearFecha(item.creado)}</span>
-            <a class="historial-stats" href="stats.html?codigo=${encodeURIComponent(item.codigo)}">Stats</a>
-          </div>
-        `;
+
+        const info = document.createElement('div');
+        info.className = 'historial-item-info';
+
+        const codigoLink = document.createElement('a');
+        codigoLink.className = 'historial-codigo';
+        codigoLink.href = item.corta;
+        codigoLink.target = '_blank';
+        codigoLink.rel = 'noopener';
+        codigoLink.textContent = item.corta;
+
+        const urlSpan = document.createElement('span');
+        urlSpan.className = 'historial-url';
+        urlSpan.title = item.url;
+        urlSpan.textContent = item.url;
+
+        info.append(codigoLink, urlSpan);
+
+        const acciones = document.createElement('div');
+        acciones.className = 'historial-item-acciones';
+
+        const fecha = document.createElement('span');
+        fecha.className = 'historial-fecha';
+        fecha.textContent = formatearFecha(item.creado);
+
+        const statsLink = document.createElement('a');
+        statsLink.className = 'historial-stats';
+        statsLink.href = `stats.html?codigo=${encodeURIComponent(item.codigo)}`;
+        statsLink.textContent = 'Stats';
+
+        acciones.append(fecha, statsLink);
+
+        li.append(info, acciones);
         historialLista.appendChild(li);
       });
     }
@@ -144,7 +167,8 @@
           body: JSON.stringify({ url })
         });
         if (!res.ok) {
-          mostrarToast('No se pudo acortar ese link');
+          const { error } = await res.json().catch(() => ({}));
+          mostrarToast(error || 'No se pudo acortar ese link');
           return;
         }
 
