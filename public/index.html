@@ -17,9 +17,11 @@
       <button type="submit">Acortar</button>
     </form>
 
+    <p id="mensaje" class="mensaje error oculto"></p>
+
     <div id="resultado" class="oculto">
       <p>Tu link corto:</p>
-      <a id="link-corto" href="#" target="_blank"></a>
+      <a id="link-corto" href="#" target="_blank" rel="noopener noreferrer"></a>
       <button id="copiar" type="button">Copiar</button>
     </div>
 
@@ -31,23 +33,47 @@
     const resultado = document.getElementById('resultado');
     const linkCorto = document.getElementById('link-corto');
 
+    const mensaje = document.getElementById('mensaje');
+
+    function mostrarError(texto) {
+      mensaje.textContent = texto;
+      mensaje.classList.remove('oculto');
+      resultado.classList.add('oculto');
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const url = document.getElementById('url').value;
-      const res = await fetch('/api/links', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
-      });
-      const data = await res.json();
-      const corta = window.location.origin + data.corta;
-      linkCorto.textContent = corta;
-      linkCorto.href = corta;
-      resultado.classList.remove('oculto');
+
+      try {
+        const res = await fetch('/api/links', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        const data = await res.json();
+
+        // Sin esto, un 400 del server pintaba "undefined" como link corto.
+        if (!res.ok) {
+          mostrarError(data.error || 'No se pudo acortar la url.');
+          return;
+        }
+
+        const corta = window.location.origin + data.corta;
+        linkCorto.textContent = corta;
+        linkCorto.href = corta;
+        mensaje.classList.add('oculto');
+        resultado.classList.remove('oculto');
+      } catch {
+        mostrarError('No se pudo conectar con el servidor.');
+      }
     });
 
-    document.getElementById('copiar').addEventListener('click', () => {
-      navigator.clipboard.writeText(linkCorto.textContent);
+    document.getElementById('copiar').addEventListener('click', async () => {
+      const boton = document.getElementById('copiar');
+      await navigator.clipboard.writeText(linkCorto.textContent);
+      boton.textContent = '¡Copiado!';
+      setTimeout(() => { boton.textContent = 'Copiar'; }, 1500);
     });
   </script>
 </body>

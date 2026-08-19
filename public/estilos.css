@@ -58,7 +58,10 @@ button:hover { background: #b5161f; }
   word-break: break-all;
 }
 
-.oculto { display: none; }
+/* !important a proposito: .oculto compite con reglas como `.stats { display:
+   flex }` que tienen la misma especificidad y estan declaradas despues, asi
+   que sin esto no llegan a ocultar nada. */
+.oculto { display: none !important; }
 
 .stats { display: flex; gap: 12px; margin-top: 24px; }
 
@@ -74,7 +77,28 @@ button:hover { background: #b5161f; }
 
 .numero { font-size: 1.4rem; font-weight: 700; color: #1f1e1e; }
 
+/* La URL de destino puede ser larga: la achicamos y la recortamos para que
+   no rompa la grilla de tarjetas. */
+.destino {
+  font-size: 0.85rem;
+  color: #da1b2e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .etiqueta { font-size: 0.8rem; color: #6b6560; }
+
+.mensaje {
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f4f2ee;
+  color: #6b6560;
+  font-size: 0.9rem;
+}
+
+.mensaje.error { background: #fdeaec; color: #b5161f; }
 
 .pie { margin-top: 28px; font-size: 0.9rem; }
 

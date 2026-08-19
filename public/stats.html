@@ -12,18 +12,84 @@
     <p class="sub">Consultá los números de un link corto</p>
 
     <form id="form-stats">
-      <input type="text" id="codigo" placeholder="ej: a3k" required>
+      <input type="text" id="codigo" placeholder="ej: a3kf9zq" required autocomplete="off">
       <button type="submit">Buscar</button>
     </form>
 
-    <!-- maqueta: datos de mentira, falta conectar con el server -->
-    <div class="stats">
-      <div class="stat"><span class="numero">123</span><span class="etiqueta">clicks</span></div>
-      <div class="stat"><span class="numero">-</span><span class="etiqueta">URL original</span></div>
-      <div class="stat"><span class="numero">-</span><span class="etiqueta">creado el</span></div>
+    <p id="mensaje" class="mensaje oculto"></p>
+
+    <div id="stats" class="stats oculto">
+      <div class="stat">
+        <span class="numero" id="clicks">-</span>
+        <span class="etiqueta">clicks</span>
+      </div>
+      <div class="stat">
+        <a class="numero destino" id="url" href="#" target="_blank" rel="noopener noreferrer">-</a>
+        <span class="etiqueta">URL original</span>
+      </div>
+      <div class="stat">
+        <span class="numero" id="creado">-</span>
+        <span class="etiqueta">creado el</span>
+      </div>
     </div>
 
     <p class="pie"><a href="index.html">Volver a acortar</a></p>
   </main>
+
+  <script>
+    const form = document.getElementById('form-stats');
+    const panel = document.getElementById('stats');
+    const mensaje = document.getElementById('mensaje');
+
+    function mostrarMensaje(texto) {
+      mensaje.textContent = texto;
+      mensaje.classList.remove('oculto');
+      panel.classList.add('oculto');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Aceptamos que peguen el link corto entero y nos quedamos con el código.
+      const codigo = document.getElementById('codigo').value.trim().replace(/^.*\//, '');
+      if (!codigo) return;
+
+      mostrarMensaje('Buscando...');
+
+      try {
+        const res = await fetch(`/api/links/${encodeURIComponent(codigo)}/stats`);
+
+        if (res.status === 404) {
+          mostrarMensaje('No existe ningún link con ese código.');
+          return;
+        }
+        if (!res.ok) {
+          mostrarMensaje('No se pudieron obtener las estadísticas. Probá de nuevo.');
+          return;
+        }
+
+        const link = await res.json();
+
+        document.getElementById('clicks').textContent = link.clicks;
+
+        const url = document.getElementById('url');
+        url.textContent = link.url;
+        url.href = link.url;
+        url.title = link.url;
+
+        document.getElementById('creado').textContent =
+          new Date(link.creado).toLocaleDateString('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          });
+
+        mensaje.classList.add('oculto');
+        panel.classList.remove('oculto');
+      } catch {
+        mostrarMensaje('No se pudo conectar con el servidor.');
+      }
+    });
+  </script>
 </body>
 </html>
