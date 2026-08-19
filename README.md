@@ -3,6 +3,9 @@
 Acortador de URLs interno. Pegás una URL larga, te devuelve un link corto, y
 podés ver cuántos clicks recibió.
 
+> **¿Recién llegás al proyecto?** Leé [CLAUDE.md](CLAUDE.md) primero: tiene el
+> estado actual, lo que falta, las decisiones ya tomadas y las trampas conocidas.
+
 ## Arrancar en local
 
 ```bash
