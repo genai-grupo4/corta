@@ -1,0 +1,17 @@
+node_modules/
+
+# Datos locales (la base se genera en runtime)
+data/
+links.json
+
+# Entorno
+.env
+.env.*
+!.env.example
+
+# Sistema / editor
+.DS_Store
+*.log
+npm-debug.log*
+.vscode/
+.idea/
